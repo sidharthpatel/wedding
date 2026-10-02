@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sidharth & Partner — January 29, 2027</title>
+  <meta name="description" content="Join us for our Gujarati wedding celebration. RSVP here.">
+  <meta property="og:title" content="We're getting married — January 29, 2027">
+  <meta property="og:description" content="You're invited. Details and RSVP inside.">
+  <meta property="og:image" content="/assets/hero.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Noto+Sans+Gujarati:wght@400;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<canvas id="petals" aria-hidden="true"></canvas>
+
+<nav class="nav" id="nav">
+  <a href="#top" class="nav-mark">S<span>&</span>P</a>
+  <div class="nav-links">
+    <a href="#story" data-t>Story</a><a href="#events" data-t>Events</a><a href="#faq" data-t>Details</a><a href="#rsvp" class="btn-mini" data-t>RSVP</a><button type="button" id="lang" class="lang" aria-label="Language">ગુજરાતી</button>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <p class="om">ૐ &nbsp; શ્રી ગણેશાય નમઃ &nbsp; ૐ</p>
+    <svg class="mandala" viewBox="0 0 200 200" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width=".8" id="mandala-g"></g></svg>
+    <p class="kicker" data-t>Together with our families</p>
+    <h1><span id="n1">Sidharth</span><em>&</em><span id="n2">Partner</span></h1>
+    <p class="date" data-t>Friday · January 29 · 2027</p>
+    <p class="city" id="city"></p>
+    <div class="countdown" id="countdown"></div>
+    <a href="#rsvp" class="btn" data-t>Kindly RSVP</a>
+  </div>
+  <a href="#story" class="scroll-hint" aria-label="Scroll">⌄</a>
+</header>
+
+<section class="section toran-top" id="story">
+  <div class="wrap narrow reveal">
+    <h2 data-t>Our Story</h2>
+    <p class="lead" id="tagline"></p>
+    <div class="story-grid">
+      <div class="polaroid"><img src="/assets/hero.webp" alt="The two of us looking over Lake Tahoe" loading="lazy"><span data-t>Lake Tahoe ✦ the quiet before the big day</span></div>
+      <div class="timeline">
+        <!-- TODO: replace with your real story -->
+        <div><b data-t>How we met</b><p data-t>Add a few lines about the day you two first met.</p></div>
+        <div><b data-t>The first “I love you”</b><p data-t>Add a favourite memory here.</p></div>
+        <div><b data-t>The proposal</b><p data-t>Tell guests how the question was asked (and answered).</p></div>
+        <div><b data-t>January 29, 2027</b><p data-t>We make it official, surrounded by the people we love most.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="events">
+  <div class="wrap">
+    <h2 class="reveal" data-t>The Celebrations</h2>
+    <p class="lead reveal" data-t>Several days of ceremony, colour and joy. Dates and venues will be added as they're finalised.</p>
+    <div class="events" id="events-list"></div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="wrap narrow reveal">
+    <h2 data-t>Good to Know</h2>
+    <div id="faq-list"></div>
+  </div>
+</section>
+
+<section class="section rsvp-sec" id="rsvp">
+  <div class="wrap narrow reveal">
+    <h2 data-t>RSVP</h2>
+    <p class="lead"><span id="lead-pre"></span> <b id="deadline"></b><span id="lead-post"></span></p>
+    <form id="rsvp-form" class="card" novalidate>
+      <input type="hidden" name="code" id="code">
+      <div class="hello" id="hello" hidden></div>
+
+      <label><span data-t>Your full name</span>
+        <input name="name" id="name" required autocomplete="name" placeholder="e.g. Ramesh Patel" data-tp="e.g. Ramesh Patel">
+      </label>
+      <div class="two">
+        <label><span data-t>Email</span>
+          <input name="email" type="email" autocomplete="email" placeholder="you@example.com" data-tp="you@example.com">
+        </label>
+        <label><span data-t>Phone / WhatsApp</span>
+          <input name="phone" type="tel" autocomplete="tel" placeholder="optional" data-tp="optional">
+        </label>
+      </div>
+
+      <fieldset>
+        <legend data-t>Which celebrations will you join?</legend>
+        <div id="event-checks"></div>
+      </fieldset>
+
+      <label><span data-t>Total guests attending (including you)</span>
+        <div class="stepper">
+          <button type="button" data-d="-1" aria-label="Fewer">−</button>
+          <input name="party_size" id="party" type="number" min="1" max="10" value="1" inputmode="numeric">
+          <button type="button" data-d="1" aria-label="More">+</button>
+        </div>
+      </label>
+      <label><span data-t>Names of everyone in your party</span>
+        <textarea name="party_names" rows="2" placeholder="So we can make name cards" data-tp="So we can make name cards"></textarea>
+      </label>
+      <div class="two">
+        <label><span data-t>Food preferences</span>
+          <select name="meal">
+            <option value="" data-t>No restrictions</option>
+            <option data-t>Jain</option>
+            <option data-t>Vegan</option>
+            <option data-t>Gluten-free</option>
+            <option data-t>No onion / garlic</option>
+          </select>
+        </label>
+        <label><span data-t>Allergies / notes</span>
+          <input name="dietary" placeholder="e.g. peanuts" data-tp="e.g. peanuts">
+        </label>
+      </div>
+      <label><span data-t>Request a Garba / Sangeet song 🎶</span>
+        <input name="song" placeholder="Song + artist" data-tp="Song + artist">
+      </label>
+      <label><span data-t>A note for the couple</span>
+        <textarea name="message" rows="3" placeholder="Blessings, advice, embarrassing stories welcome…" data-tp="Blessings, advice, embarrassing stories welcome…"></textarea>
+      </label>
+
+      <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn" type="submit" id="submit" data-t>Send RSVP</button>
+      <p class="err" id="err" role="alert"></p>
+    </form>
+
+    <div class="card thanks" id="thanks" hidden>
+      <div class="big">🪷</div>
+      <h3><span id="t-thanks"></span> <span id="t-name"></span>!</h3>
+      <p id="t-msg"></p>
+      <button class="btn ghost" id="edit" data-t>Update my response</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p class="gu">શુભ લગ્ન</p>
+  <p><span data-t>With love,</span> <span id="f1"></span> & <span id="f2"></span> · 01 · 29 · 2027</p>
+  <p class="small"><span data-t>Questions?</span> <a id="contact" href="#" data-t>Get in touch</a></p>
+</footer>
+
+<script src="/config.js"></script>
+<script src="/i18n.js"></script>
+<script src="/script.js"></script>
+</body>
+</html>

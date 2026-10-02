@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>RSVP Admin</title>
+<style>
+body{font-family:system-ui,sans-serif;margin:0;background:#fff9ef;color:#3a2a22}
+main{max-width:1100px;margin:0 auto;padding:24px}
+h1{color:#7a1426}h2{margin-top:36px;color:#7a1426}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:#fff;border:1px solid #e9cf8f;border-radius:12px;padding:14px}
+.stat b{font-size:1.8rem;display:block;color:#b3202f}
+table{width:100%;border-collapse:collapse;background:#fff;font-size:.9rem}
+td,th{padding:8px 10px;border-bottom:1px solid #eee;text-align:left;vertical-align:top}
+th{background:#f8eddb}
+input,textarea,button{font:inherit;padding:8px 10px;border-radius:8px;border:1px solid #cdb98f}
+button{background:#b3202f;color:#fff;border:0;cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.scroll{overflow-x:auto}
+.muted{color:#8a7565}
+</style></head><body><main>
+<h1>Wedding RSVP Admin</h1>
+<div class="row" id="login"><input id="tok" type="password" placeholder="Admin token"><button id="go">Unlock</button></div>
+<div id="app" hidden>
+  <div class="stats" id="stats"></div>
+  <h2>Responses</h2>
+  <div class="row"><button id="csv">Download CSV</button><button id="refresh">Refresh</button></div>
+  <div class="scroll"><table id="tbl"></table></div>
+
+  <h2>Invite links</h2>
+  <p class="muted">One per line: <code>Name, seats</code> (e.g. <code>Patel Family, 4</code>). Links go to every event unless you restrict later in the DB.</p>
+  <textarea id="bulk" rows="5" style="width:100%" placeholder="Patel Family, 4&#10;Shah Family, 3"></textarea>
+  <div class="row"><button id="mk">Generate links</button></div>
+  <div class="scroll"><table id="gtbl"></table></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let tok=sessionStorage.getItem("tok")||"", data=null;
+const api=(p,o={})=>fetch(p,{...o,headers:{...(o.headers||{}),authorization:"Bearer "+tok,"content-type":"application/json"}});
+async function load(){
+  const r=await api("/api/admin/rsvps");
+  if(!r.ok){$("#app").hidden=true;$("#login").hidden=false;sessionStorage.removeItem("tok");return alert("Unauthorized");}
+  data=await r.json();sessionStorage.setItem("tok",tok);$("#login").hidden=true;$("#app").hidden=false;render();
+}
+function render(){
+  const ev={};let heads=0,yes=0,no=0;
+  data.rsvps.forEach(x=>{const e=JSON.parse(x.events||"[]");if(e.length){yes++;heads+=x.party_size;e.forEach(i=>ev[i]=(ev[i]||0)+x.party_size)}else no++});
+  const answered=new Set(data.rsvps.map(r=>r.key));
+  const pending=data.guests.filter(g=>!answered.has(g.code)).length;
+  $("#stats").innerHTML=`<div class=stat><b>${yes}</b>replied yes</div><div class=stat><b>${no}</b>declined</div><div class=stat><b>${heads}</b>total guests</div><div class=stat><b>${pending}</b>invites pending</div>`+
+    Object.entries(ev).map(([k,v])=>`<div class=stat><b>${v}</b>${esc(k)}</div>`).join("");
+  $("#tbl").innerHTML="<tr><th>Name<th>Party<th>Events<th>Food<th>Contact<th>Song<th>Note<th>Updated</tr>"+data.rsvps.map(x=>`<tr><td>${esc(x.name)}<td>${x.party_size}<br><small>${esc(x.party_names)}</small><td>${JSON.parse(x.events||"[]").join(", ")||"—"}<td>${esc(x.meal)} ${esc(x.dietary)}<td>${esc(x.email)}<br>${esc(x.phone)}<td>${esc(x.song)}<td>${esc(x.message)}<td>${esc(x.updated_at)}`).join("");
+  const base=location.origin;
+  $("#gtbl").innerHTML="<tr><th>Name<th>Seats<th>Link<th>Status</tr>"+data.guests.map(g=>`<tr><td>${esc(g.name)}<td>${g.seats}<td><a href="${base}/?invite=${g.code}">${base}/?invite=${g.code}</a><td>${answered.has(g.code)?"✅ replied":"⏳"}`).join("");
+}
+$("#go").onclick=()=>{tok=$("#tok").value;load()};
+$("#refresh").onclick=load;
+$("#mk").onclick=async()=>{
+  const guests=$("#bulk").value.split("\n").map(l=>l.split(",")).filter(p=>p[0].trim()).map(p=>({name:p[0].trim(),seats:+p[1]||1}));
+  if(!guests.length)return;
+  const r=await api("/api/admin/guests",{method:"POST",body:JSON.stringify({guests})});
+  if(r.ok){$("#bulk").value="";load()}else alert("Failed");
+};
+$("#csv").onclick=()=>{
+  const cols=["name","party_size","party_names","events","meal","dietary","email","phone","song","message","updated_at"];
+  const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  const csv=[cols.join(",")].concat(data.rsvps.map(r=>cols.map(c=>q(r[c])).join(","))).join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="rsvps.csv";a.click();
+};
+if(tok)load();
+</script></main></body></html>
